@@ -11,23 +11,30 @@
 		<button onClick="clearCookie()">clear cookie</button>
 		<a style="font-weight: bold" href="https://www.youtube.com/watch?v=z3v4rIG8kQA">YouTube</a>
 		<script>
-			function setCookie() {
-				document.cookie = cookie_name + "=true";
-			}
-			function clearCookie() {
-				document.cookie = cookie_name + "=false;expires=Thu, 01 Jan 1970 00:00:01 GMT";
+			function checkCookie() {
+				var isCookieExisted = document.cookie.split(';').filter((item) => item.includes(cookie_name)).length != 0;
+				if (isCookieExisted) {
+					document.getElementById("cookie-state").innerHTML = "Cookie exists!";
+					console.log('has cookie');
+				} else {
+					document.getElementById("cookie-state").innerHTML = "No cookie exists!";
+					console.log('no cookie');
+				}
 			}
 
-			var cookie_name = 'iamcookie';
-			var isCookieExisted = document.cookie.split(';').filter((item) => item.includes(cookie_name)).length != 0;
-			if (isCookieExisted) {
-				document.getElementById("cookie-state").innerHTML = "Cookie exists!";
-				console.log('has cookie');
-			} else {
-				document.getElementById("cookie-state").innerHTML = "No cookie exists!";
-				console.log('no cookie');
-				setCookie();
+			function setCookie() {
+				document.cookie = cookie_name + "=true";
+				checkCookie();
 			}
+
+			function clearCookie() {
+				document.cookie = cookie_name + "=false;expires=Thu, 01 Jan 1970 00:00:01 GMT";
+				checkCookie();
+			}
+
+			checkCookie();
+
+			var cookie_name = 'iamcookie';
 		</script>
 	</body>
 </html>

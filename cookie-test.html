@@ -7,9 +7,13 @@
 	<body style="text-align: center; font-size: 2em">
 		<div id='cookie-state' style="text-align: center; background: white; padding: 10px">
 		</div>
-		<button onClick="setCookie()">set cookie</button>
-		<button onClick="clearCookie()">clear cookie</button>
-		<a style="font-weight: bold" href="https://www.youtube.com/watch?v=z3v4rIG8kQA">YouTube</a>
+		<div>
+			<button onClick="setCookie()">set cookie</button>
+			<button onClick="clearCookie()">clear cookie</button>
+		</div>
+		<div>
+			<a style="font-weight: bold" href="https://www.youtube.com/watch?v=z3v4rIG8kQA">YouTube</a>
+		</div>
 		<script>
 			function checkCookie() {
 				var isCookieExisted = document.cookie.split(';').filter((item) => item.includes(cookie_name)).length != 0;

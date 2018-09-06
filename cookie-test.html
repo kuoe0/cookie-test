@@ -15,6 +15,7 @@
 			<a style="font-weight: bold" href="https://www.youtube.com/watch?v=z3v4rIG8kQA">YouTube</a>
 		</div>
 		<script>
+			var cookie_name = 'iamcookie';
 			function checkCookie() {
 				var isCookieExisted = document.cookie.split(';').filter((item) => item.includes(cookie_name)).length != 0;
 				if (isCookieExisted) {
@@ -37,8 +38,6 @@
 			}
 
 			checkCookie();
-
-			var cookie_name = 'iamcookie';
 		</script>
 	</body>
 </html>

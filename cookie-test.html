@@ -10,6 +10,13 @@
 		<button onClick="setCookie()">set cookie</button>
 		<button onClick="clearCookie()">clear cookie</button>
 		<script>
+			function setCookie() {
+				document.cookie = cookie_name + "=true";
+			}
+			function clearCookie() {
+				document.cookie = cookie_name + "=false;expires=Thu, 01 Jan 1970 00:00:01 GMT";
+			}
+
 			var cookie_name = 'iamcookie';
 			var isCookieExisted = document.cookie.split(';').filter((item) => item.includes(cookie_name)).length != 0;
 			if (isCookieExisted) {
@@ -18,13 +25,7 @@
 			} else {
 				document.getElementById("cookie-state").innerHTML = "No cookie exists!";
 				console.log('no cookie');
-			}
-
-			function setCookie() {
-				document.cookie = cookie_name + "=true";
-			}
-			function clearCookie() {
-				document.cookie = cookie_name + "=false;expires=Thu, 01 Jan 1970 00:00:01 GMT";
+				setCookie();
 			}
 		</script>
 	</body>

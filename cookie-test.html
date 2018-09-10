@@ -3,28 +3,108 @@
 	<head>
         <meta charset="utf-8" />
 		<title>cookie-test</title>
+		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+		<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+		<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+		<style>
+th, td:nth-child(2), td:nth-child(3) {
+	text-align: center;
+}
+		</style>
 	</head>
-	<body style="text-align: center; font-size: 2em">
-		<div id='cookie-state' style="text-align: center; background: white; padding: 10px">
+
+	<body>
+
+		<div class="container">
+			<table class="table table-bordered">
+				<thead>
+					<tr>
+						<th scope="col">Type</th>
+						<th scope="col">Status</th>
+						<th scope="col">Action</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td>
+							Appcache
+						</td>
+						<td id="appcache-status">
+						</td>
+						<td>
+							<button type="button" onClick="setAppcache()" class="btn btn-success">Set</button>
+							<button type="button" onClick="clearAppcache()" class="btn btn-danger">Clear</button>
+						</td>
+					</tr>
+					<tr>
+						<td>
+							Cookie
+						</td>
+						<td id="cookie-status">
+						</td>
+						<td>
+							<button type="button" onClick="setCookie()" class="btn btn-success">Set</button>
+							<button type="button" onClick="clearCookie()" class="btn btn-danger">Clear</button>
+						</td>
+					</tr>
+					<tr>
+						<td>
+							File Systems
+						</td>
+						<td id="file-systems-status">
+						</td>
+						<td>
+							<button type="button" onClick="setFileSystems()" class="btn btn-success">Set</button>
+							<button type="button" onClick="clearFileSystems()" class="btn btn-danger">Clear</button>
+						</td>
+					</tr>
+					<tr>
+						<td>
+							IndexedDB
+						</td>
+						<td id="indexeddb-status">
+						</td>
+						<td>
+							<button type="button" onClick="setIndexedDB()" class="btn btn-success">Set</button>
+							<button type="button" onClick="clearIndexedDB()" class="btn btn-danger">Clear</button>
+						</td>
+					</tr>
+					<tr>
+						<td>
+							Local Storage
+						</td>
+						<td id="local-storage-status">
+						</td>
+						<td>
+							<button type="button" onClick="setLocalStorage()" class="btn btn-success">Set</button>
+							<button type="button" onClick="clearLocalStorage()" class="btn btn-danger">Clear</button>
+						</td>
+					</tr>
+					<tr>
+						<td>
+							WebSQL
+						</td>
+						<td id="websql-status">
+						</td>
+						<td>
+							<button type="button" onClick="setWebSQL()" class="btn btn-success">Set</button>
+							<button type="button" onClick="clearWebSQL()" class="btn btn-danger">Clear</button>
+						</td>
+					</tr>
+				</tbody>
+			</table>
 		</div>
-		<div>
-			<button onClick="setCookie()">set cookie</button>
-			<button onClick="clearCookie()">clear cookie</button>
-		</div>
-		<div>
-			<a style="font-weight: bold" href="https://www.youtube.com/watch?v=z3v4rIG8kQA">YouTube</a>
-		</div>
+
 		<script>
 			var cookie_name = 'iamcookie';
+			var indexedDB_data = 'iamindexeddb';
+			var local_storage_key = "test-local-storage";
+
 			function checkCookie() {
-				var isCookieExisted = document.cookie.split(';').filter((item) => item.includes(cookie_name)).length != 0;
-				if (isCookieExisted) {
-					document.getElementById("cookie-state").innerHTML = "Cookie exists!";
-					console.log('has cookie');
-				} else {
-					document.getElementById("cookie-state").innerHTML = "No cookie exists!";
-					console.log('no cookie');
-				}
+				let isCookieExisted = document.cookie.split(';').filter((item) => item.includes(cookie_name)).length != 0;
+				console.log("Cookie " + (isCookieExisted ? "Exists!" : "Not Exists!"));
+				document.getElementById("cookie-status").innerHTML = isCookieExisted ? "Exists!" : "Not Exists!";
 			}
 
 			function setCookie() {
@@ -37,7 +117,87 @@
 				checkCookie();
 			}
 
+			function checkLocalStorage() {
+				let isLocalStorageExisted = localStorage.getItem(local_storage_key) != null;
+				console.log("LocalStorage " + (isLocalStorageExisted ? "Exists!" : "Not Exists!"));
+				document.getElementById("local-storage-status").innerHTML = isLocalStorageExisted ? "Exists!" : "Not Exists!";
+			}
+
+			function setLocalStorage() {
+				localStorage.setItem(local_storage_key, "");
+				checkLocalStorage();
+			}
+
+			function clearLocalStorage() {
+				localStorage.removeItem(local_storage_key);
+				checkLocalStorage();
+			}
+
+			function openIndexedDB() {
+				let request = indexedDB.open("TestDatabase");
+				request.onupgradeneeded = function(event) {
+					let db = event.target.result;
+					let objectStore = db.createObjectStore("TestObjectStore", { keyPath: "name" });
+					objectStore.createIndex("name", "name");
+				};
+				return request;
+			}
+
+			function checkIndexedDB() {
+				let request = openIndexedDB();
+				request.onsuccess = function(evt) {
+					let db = evt.target.result;
+					let tx = db.transaction("TestObjectStore", IDBTransaction.READ_WRITE);
+					let store = tx.objectStore("TestObjectStore");
+					let index = store.index("name");
+
+					let getData = index.get(indexedDB_data);
+					getData.onsuccess = function () {
+						console.log(getData.result);
+						let isIndexedDBExisted = !!getData.result;
+						document.getElementById("indexeddb-status").innerHTML = isIndexedDBExisted ? "Exists!" : "Not Exists!";
+					};
+
+					tx.oncomplete = function() {
+						db.close();
+					}
+				};
+			}
+
+			function setIndexedDB() {
+				let request = openIndexedDB();
+				request.onsuccess = function(evt) {
+					let db = evt.target.result;
+					let tx = db.transaction("TestObjectStore", "readwrite");
+					let store = tx.objectStore("TestObjectStore");
+					let request = store.put({ name: indexedDB_data });
+					request.onsuccess = function (evt) {
+						console.log("write data to indexedDB successfully.")
+					};
+					tx.oncomplete = function() {
+						db.close();
+					}
+					checkIndexedDB();
+				};
+			}
+
+			function clearIndexedDB() {
+				let request = openIndexedDB();
+				request.onsuccess = function(evt) {
+					let db = evt.target.result;
+					let tx = db.transaction("TestObjectStore", "readwrite");
+					let store = tx.objectStore("TestObjectStore");
+					let deleteRequest = store.delete(indexedDB_data);
+					deleteRequest.onsuccess = function(evt) {
+						console.log("delete data from indexedDB successfully.")
+					};
+					checkIndexedDB();
+				};
+			}
+
 			checkCookie();
+			checkLocalStorage();
+			checkIndexedDB();
 		</script>
 	</body>
 </html>

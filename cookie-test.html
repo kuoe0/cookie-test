@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html manifest="cache.appcache">
 	<head>
         <meta charset="utf-8" />
 		<title>cookie-test</title>
@@ -11,7 +11,21 @@
 th, td:nth-child(2), td:nth-child(3) {
 	text-align: center;
 }
+
 		</style>
+		<script>
+			window.onload = () => {
+				applicationCache.addEventListener('noupdate', () => {
+					console.log("Appcache Exists!");
+					document.getElementById("appcache-status").innerHTML = "Exists!";
+				}, false);
+
+				applicationCache.addEventListener('downloading', () => {
+					console.log("Appcache Not Exists!");
+					document.getElementById("appcache-status").innerHTML = "Not Exists!";
+				}, false);
+			};
+		</script>
 	</head>
 
 	<body>
@@ -33,8 +47,6 @@ th, td:nth-child(2), td:nth-child(3) {
 						<td id="appcache-status">
 						</td>
 						<td>
-							<button type="button" onClick="setAppcache()" class="btn btn-success">Set</button>
-							<button type="button" onClick="clearAppcache()" class="btn btn-danger">Clear</button>
 						</td>
 					</tr>
 					<tr>
@@ -100,6 +112,7 @@ th, td:nth-child(2), td:nth-child(3) {
 			var cookie_name = 'iamcookie';
 			var indexedDB_data = 'iamindexeddb';
 			var local_storage_key = "test-local-storage";
+			var filesystem_name = 'iamfilesystem.txt';
 
 			function checkCookie() {
 				let isCookieExisted = document.cookie.split(';').filter((item) => item.includes(cookie_name)).length != 0;
@@ -153,7 +166,6 @@ th, td:nth-child(2), td:nth-child(3) {
 
 					let getData = index.get(indexedDB_data);
 					getData.onsuccess = function () {
-						console.log(getData.result);
 						let isIndexedDBExisted = !!getData.result;
 						document.getElementById("indexeddb-status").innerHTML = isIndexedDBExisted ? "Exists!" : "Not Exists!";
 					};
@@ -195,9 +207,80 @@ th, td:nth-child(2), td:nth-child(3) {
 				};
 			}
 
+			function checkFileSystem() {
+				webkitRequestFileSystem(window.TEMPORARY, 5*1024*1024 /* 5MB */, (fs) => {
+					console.log("FileSystem: " + fs.name);
+					fs.root.getFile(filesystem_name, {}, (fileEntry) => {
+						console.log("FileSystem Exists!");
+						document.getElementById("file-systems-status").innerHTML = "Exists!";
+					}, (err) => {
+						console.log("FileSystem Not Exists!");
+						document.getElementById("file-systems-status").innerHTML = "Not Exists!";
+					});
+				});
+			}
+
+			function setFileSystems() {
+				webkitRequestFileSystem(window.TEMPORARY, 5*1024*1024 /* 5MB */, (fs) => {
+					fs.root.getFile(filesystem_name, {create: true}, function(fileEntry) {
+						fileEntry.createWriter(function(fileWriter) {
+							fileWriter.onwriteend = function(e) {
+								console.log("FileSystem: Write completed.");
+								checkFileSystem();
+							};
+
+							let blob = new Blob(["Lorem Ipsum"], {type: "text/plain"});
+							fileWriter.write(blob);
+						});
+					});
+				});
+			}
+
+			function clearFileSystems() {
+				webkitRequestFileSystem(window.TEMPORARY, 5*1024*1024 /* 5MB */, (fs) => {
+
+					fs.root.getFile(filesystem_name, {create: false}, function(fileEntry) {
+						fileEntry.remove(function() {
+							console.log("FileSystem: File removed.");
+							checkFileSystem();
+						});
+					});
+				});
+			}
+
+			function checkWebSQL() {
+				let db = openDatabase("websql", "1.0", "test database", 2 * 1024 * 1024);
+				db.transaction(function (tx) {
+					tx.executeSql('SELECT * FROM foo', [], (t, data) => {
+						document.getElementById("websql-status").innerHTML = "Exists!";
+					}, (err) => {
+						document.getElementById("websql-status").innerHTML = "Not Exists!";
+					});
+				});
+			}
+
+			function setWebSQL() {
+				let db = openDatabase("websql", "1.0", "test database", 2 * 1024 * 1024);
+				db.transaction(function (tx) {
+					tx.executeSql('CREATE TABLE foo (id unique, text)');
+					tx.executeSql('INSERT INTO foo (id, text) VALUES (?, ?)', [1, "websql"]);
+					checkWebSQL();
+				});
+			}
+
+			function clearWebSQL() {
+				let db = openDatabase("websql", "1.0", "test database", 2 * 1024 * 1024);
+				db.transaction(function (tx) {
+					tx.executeSql('DROP TABLE foo');
+					checkWebSQL();
+				});
+			}
+
 			checkCookie();
 			checkLocalStorage();
 			checkIndexedDB();
+			checkFileSystem();
+			checkWebSQL();
 		</script>
 	</body>
 </html>
